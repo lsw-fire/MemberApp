@@ -1,115 +1,76 @@
 package lsw.system.member.business;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.os.Handler;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.ViewGroup;
-import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.google.zxing.Result;
 
-import lsw.system.member.mylibrary.IViewFinder;
-import lsw.system.member.mylibrary.ViewFinderView;
+public class MainActivity extends AppCompatActivity  {
 
-public class MainActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
-    private ZXingScannerView mScannerView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-        mScannerView = new ZXingScannerView(this) {
-            @Override
-            protected IViewFinder createViewFinderView(Context context) {
-                return new CustomViewFinderView(context);
-            }
-        };
-        contentFrame.addView(mScannerView);
-    }
-    @Override
-    public void onResume() {
-        super.onResume();
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
+        toolbar = (Toolbar) findViewById(R.id.toolbar); // Attaching the layout to the toolbar object
+
+        setSupportActionBar(toolbar);
+
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     @Override
-    public void handleResult(Result rawResult) {
-        Toast.makeText(this, "Contents = " + rawResult.getText() +
-                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-        // Note:
-        // * Wait 2 seconds to resume the preview.
-        // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
-        // * I don't know why this is the case but I don't have the time to figure out.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mScannerView.resumeCameraPreview(MainActivity.this);
-            }
-        }, 2000);
-    }
-
-    private static class CustomViewFinderView extends ViewFinderView {
-        public static final String TRADE_MARK_TEXT = "ZXing";
-        public static final int TRADE_MARK_TEXT_SIZE_SP = 40;
-        public final Paint PAINT = new Paint();
-
-        public CustomViewFinderView(Context context) {
-            super(context);
-            init();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
 
-        public CustomViewFinderView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-            init();
+        if (id == R.id.menuPay){
+
+            Intent i = new Intent(this, Member_Pay.class);
+            startActivity(i);
         }
 
-        private void init() {
-            PAINT.setColor(Color.WHITE);
-            PAINT.setAntiAlias(true);
-            float textPixelSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
-                    TRADE_MARK_TEXT_SIZE_SP, getResources().getDisplayMetrics());
-            PAINT.setTextSize(textPixelSize);
-            setSquareViewFinder(true);
+        if (id == R.id.menuMemberAdd)
+        {
+            Intent i = new Intent(this, Member_Maintain.class);
+            i.putExtra("isAdd",true);
+            startActivity(i);
         }
 
-        @Override
-        public void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-            drawTradeMark(canvas);
+        if (id==R.id.menuProductAdd)
+        {
+            Intent i = new Intent(this, Product_Maintain.class);
+            i.putExtra("isAdd",true);
+            startActivity(i);
         }
 
-        private void drawTradeMark(Canvas canvas) {
-            Rect framingRect = getFramingRect();
-            float tradeMarkTop;
-            float tradeMarkLeft;
-            if (framingRect != null) {
-                tradeMarkTop = framingRect.bottom + PAINT.getTextSize() + 10;
-                tradeMarkLeft = framingRect.left;
-            } else {
-                tradeMarkTop = 10;
-                tradeMarkLeft = canvas.getHeight() - PAINT.getTextSize() - 10;
-            }
-            canvas.drawText(TRADE_MARK_TEXT, tradeMarkLeft, tradeMarkTop, PAINT);
+        if (id == R.id.menuMemberLevel)
+        {
+            Intent i = new Intent(this, Member_Level_Maintain.class);
+            startActivity(i);
         }
+
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

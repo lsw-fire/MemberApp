@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menuPay"
+        android:orderInCategory="110"
+        android:title="收费" app:showAsAction="always"  />
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/login"
+        android:orderInCategory="110"
+        android:title="登录"/>
+    <item
+        android:id="@+id/menuMemberAdd"
+        android:orderInCategory="110"
+        android:title="添加会员"/>
+    <item
+        android:id="@+id/menuMemberLevel"
+        android:orderInCategory="110"
+        android:title="会员级别设置"/>
+    <item
+        android:id="@+id/menuProductAdd"
+        android:orderInCategory="110"
+        android:title="添加产品"/>
+
+</menu>
