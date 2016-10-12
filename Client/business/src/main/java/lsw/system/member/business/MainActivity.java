@@ -7,6 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -18,10 +20,14 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+        Gson gson = new Gson();
+        User user = gson.fromJson("{name:\"lishiwei\",age:34}", User.class);
+        String userName = user.getName();
+
         toolbar = (Toolbar) findViewById(R.id.toolbar); // Attaching the layout to the toolbar object
-
         setSupportActionBar(toolbar);
-
     }
 
     @Override
@@ -72,5 +78,29 @@ public class MainActivity extends AppCompatActivity  {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public class User
+    {
+        private String name;
+        private String age;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getAge() {
+            return age;
+        }
+
+        public void setAge(String age) {
+            this.age = age;
+        }
+    }
 }
+
+
 

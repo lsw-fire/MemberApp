@@ -10,13 +10,31 @@
     tools:context="lsw.system.member.business.Product_Maintain"
     android:orientation="vertical">
 
-    <EditText style="@style/Normal_Field_Height" android:textSize="20dp"
+    <LinearLayout
+        style="@style/Normal_Field_Height"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center|left"
+            android:text="产品分类"
+            android:textSize="20dp" />
+
+        <Spinner android:id="@+id/spProductCategory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"></Spinner>
+    </LinearLayout>
+
+    <EditText android:id="@+id/etProductName" style="@style/Normal_Field_Height" android:textSize="20dp"
         android:hint="产品名称:索纳克斯" />
 
 
-    <EditText style="@style/Normal_Field_Height" android:textSize="20dp"
+    <EditText android:id="@+id/etProductPrice" style="@style/Normal_Field_Height" android:textSize="20dp"
         android:hint="单价:200" android:inputType="numberDecimal" />
 
     <Button style="@style/Normal_Field_Height" android:layout_marginTop="10dp"
-        android:text="保存" />
+        android:text="保存" android:id="@+id/btnSave" />
 </LinearLayout>
