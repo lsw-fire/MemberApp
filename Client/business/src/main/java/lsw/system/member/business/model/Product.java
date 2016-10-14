@@ -1,9 +1,11 @@
 package lsw.system.member.business.model;
 
+import io.realm.RealmObject;
+
 /**
  * Created by swli on 10/12/2016.
  */
-public class Product {
+public class Product extends RealmObject{
 
     private double productPrice;
     private String productName;

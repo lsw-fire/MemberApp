@@ -19,6 +19,8 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -30,21 +32,38 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmObject;
 import lsw.system.member.business.model.ModelContext;
 import lsw.system.member.business.model.Product;
 import lsw.system.member.business.model.ProductCategory;
+import lsw.system.member.business.utility.FileHelper;
+import lsw.system.member.business.utility.MySpinnerAdapter;
 
 public class Product_Maintain extends AppCompatActivity {
 
-    List<ProductCategory> listPC= new ArrayList<ProductCategory>();
+    ArrayList<ProductCategory> listPC= new ArrayList<ProductCategory>();
 
     private Context mContext;
     private ProductCategory selectedPC;
+
+    private Realm realm;
+
+    @Override
+    public void onDestroy() {
+        realm.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_maintain);
+
+        RealmConfiguration config = new RealmConfiguration.Builder(this).build();
+        Realm.setDefaultConfiguration(config);
+        realm = Realm.getDefaultInstance();
 
         mContext = this;
 
@@ -55,10 +74,27 @@ public class Product_Maintain extends AppCompatActivity {
 
         Type type = new TypeToken<ArrayList<ProductCategory>>() {}.getType();
 
-        String json = loadProductsFromAssets();
-        listPC = new Gson().fromJson(json,type);
+        String json = FileHelper.openJsonFile(this,"ProductCategory.json");
+        listPC = new GsonBuilder()
+                .setExclusionStrategies(new ExclusionStrategy() {
+                    @Override
+                    public boolean shouldSkipField(FieldAttributes f) {
+                        return f.getDeclaringClass().equals(RealmObject.class);
+                    }
 
-        SpinnerAdapter myAdapter = new MyAdapter();
+                    @Override
+                    public boolean shouldSkipClass(Class<?> clazz) {
+                        return false;
+                    }
+                })
+                .create().fromJson(json,type);
+
+        SpinnerAdapter myAdapter = new MySpinnerAdapter<ProductCategory>(mContext,listPC) {
+            @Override
+            public String getTValue(ProductCategory productCategory) {
+                return productCategory.getName();
+            }
+        };
         spinner.setAdapter(myAdapter);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -77,101 +113,30 @@ public class Product_Maintain extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Product product = new Product();
+                //Product product = new Product();
+                //product.setProductName(etProductName.getText().toString());
+                //product.setProductPrice(Double.parseDouble(etProductPrice.getText().toString()));
+                //product.setProductCategory(selectedPC);
+
+//                Gson gson = new Gson();
+//                String result = gson.toJson(product);
+//                Log.d("save product",result);
+//
+//                ModelContext modelContext = new ModelContext(mContext);
+//                modelContext.saveToFile(result);
+
+
+                //Realm realm = Realm.getInstance(mContext);
+                realm.beginTransaction();
+                Product product = realm.createObject(Product.class); // Create a new object
                 product.setProductName(etProductName.getText().toString());
                 product.setProductPrice(Double.parseDouble(etProductPrice.getText().toString()));
-                product.setProductCategory(selectedPC);
+                //product.setProductCategory(selectedPC);
+                realm.commitTransaction();
 
-                Gson gson = new Gson();
-                String result = gson.toJson(product);
-                Log.d("save product",result);
 
-                ModelContext modelContext = new ModelContext(mContext);
-                modelContext.saveToFile(result);
-
-                Toast.makeText(mContext,"保存产品成功",Toast.LENGTH_SHORT);
+                Toast.makeText(mContext,"保存产品成功",Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private String loadProductsFromAssets() {
-        String json = null;
-        try {
-            InputStream is = this.getAssets().open("ProductCategory.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (Exception e) {
-                Log.e("LP", "Load product", e);
-        }
-        return json;
-    }
-
-    private class MyAdapter implements SpinnerAdapter {
-        private ThemedSpinnerAdapter.Helper helper;
-
-
-        @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-
-        }
-
-        @Override
-        public int getCount() {
-            return listPC.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return listPC.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView textView = new TextView(mContext);
-            textView.setTextSize(20);
-            textView.setText(listPC.get(position).getName());
-            return textView;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return 1;
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return false;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            TextView textView = new TextView(mContext);
-            textView.setTextSize(20);
-            textView.setText(listPC.get(position).getName());
-            return textView;
-        }
     }
 }
